@@ -45,6 +45,7 @@ class DutyScheduler:
         for emp in employees_data:
             schedule[emp['name']] = {
                 'code': emp['code'],
+                'sr': emp['sr'],
                 'post': emp['post'],
                 'shifts': [''] * num_days
             }
@@ -54,6 +55,7 @@ class DutyScheduler:
                 if self.should_be_rest_day(year, month, day, emp['rest_day']):
                     schedule[emp['name']]['shifts'][day - 1] = 'R'
             
+            # Then assign shifts
             current_shift = emp['start_shift']
             for day in range(1, num_days + 1):
                 if schedule[emp['name']]['shifts'][day - 1] != 'R':
