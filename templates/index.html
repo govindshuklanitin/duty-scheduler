@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Duty Schedule Generator - BAGASSE YARD</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background-color: #366092;
+            color: white;
+            padding: 20px 0;
+            margin-bottom: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .schedule-table {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: auto;
+        }
+        .table th {
+            background-color: #366092;
+            color: white;
+        }
+        .controls {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        .btn-primary {
+            background-color: #366092;
+            border-color: #366092;
+        }
+        .btn-primary:hover {
+            background-color: #284670;
+            border-color: #284670;
+        }
+        .employee-form {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        .employee-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header text-center">
+            <h1>BAGASSE YARD</h1>
+            <h2>Duty Schedule Generator</h2>
+        </div>
+
+        <div class="controls">
+            <div class="row">
+                <div class="col-md-6">
+                    <label for="month" class="form-label">Month</label>
+                    <select class="form-select" id="month">
+                        <option value="1">January</option>
+                        <option value="2">February</option>
+                        <option value="3">March</option>
+                        <option value="4">April</option>
+                        <option value="5">May</option>
+                        <option value="6">June</option>
+                        <option value="7">July</option>
+                        <option value="8">August</option>
+                        <option value="9">September</option>
+                        <option value="10">October</option>
+                        <option value="11">November</option>
+                        <option value="12">December</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label for="year" class="form-label">Year</label>
+                    <input type="number" class="form-control" id="year" value="2025">
+                </div>
+            </div>
+        </div>
+
+        <div class="employee-form">
+            <h4>Add Employee</h4>
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label for="empName" class="form-label">Name</label>
+                    <input type="text" class="form-control" id="empName">
+                </div>
+                <div class="col-md-2">
+                    <label for="empCode" class="form-label">Code No.</label>
+                    <input type="text" class="form-control" id="empCode">
+                </div>
+                <div class="col-md-2">
+                    <label for="empPost" class="form-label">Post</label>
+                    <select class="form-select" id="empPost">
+                        <option value="SUPERVISOR">Supervisor</option>
+                        <option value="HELPER">Helper</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label for="empShift" class="form-label">First Shift</label>
+                    <select class="form-select" id="empShift">
+                        <option value="A">A (06:00-14:00)</option>
+                        <option value="B">B (14:00-22:00)</option>
+                        <option value="C">C (22:00-06:00)</option>
+                        <option value="G">G (General)</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label for="empRestDay" class="form-label">Rest Day</label>
+                    <select class="form-select" id="empRestDay">
+                        <option value="0">Sunday</option>
+                        <option value="1">Monday</option>
+                        <option value="2">Tuesday</option>
+                        <option value="3">Wednesday</option>
+                        <option value="4">Thursday</option>
+                        <option value="5">Friday</option>
+                        <option value="6">Saturday</option>
+                    </select>
+                </div>
+                <div class="col-md-1">
+                    <label class="form-label">&nbsp;</label>
+                    <button class="btn btn-primary w-100" onclick="addEmployee()">Add</button>
+                </div>
+            </div>
+
+            <div class="employee-list mt-4">
+                <h5>Added Employees</h5>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Code</th>
+                            <th>Post</th>
+                            <th>First Shift</th>
+                            <th>Rest Day</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="employeeList">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="row mt-3">
+            <div class="col-12 text-center">
+                <button class="btn btn-primary me-2" onclick="generateSchedule()">Generate Schedule</button>
+                <button class="btn btn-success" onclick="exportToExcel()">Export to Excel</button>
+            </div>
+        </div>
+
+        <div class="schedule-table mt-4">
+            <table class="table table-bordered table-hover" id="scheduleTable">
+            </table>
+        </div>
+    </div>
+
+    <script>
+        let employees = [];
+        const weekDays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+        window.onload = function() {
+            const now = new Date();
+            document.getElementById('month').value = now.getMonth() + 1;
+            document.getElementById('year').value = now.getFullYear();
+        };
+
+        function addEmployee() {
+            const name = document.getElementById('empName').value;
+            const code = document.getElementById('empCode').value;
+            const post = document.getElementById('empPost').value;
+            const shift = document.getElementById('empShift').value;
+            const restDay = document.getElementById('empRestDay').value;
+
+            if (!name || !code) {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            const employee = {
+                name: name,
+                code: code,
+                post: post,
+                start_shift: shift,
+                rest_day: parseInt(restDay)
+            };
+
+            employees.push(employee);
+            updateEmployeeList();
+            clearEmployeeForm();
+        }
+
+        function clearEmployeeForm() {
+            document.getElementById('empName').value = '';
+            document.getElementById('empCode').value = '';
+            document.getElementById('empPost').selectedIndex = 0;
+            document.getElementById('empShift').selectedIndex = 0;
+            document.getElementById('empRestDay').selectedIndex = 0;
+        }
+
+        function removeEmployee(index) {
+            employees.splice(index, 1);
+            updateEmployeeList();
+        }
+
+        function updateEmployeeList() {
+            const tbody = document.getElementById('employeeList');
+            tbody.innerHTML = '';
+
+            employees.forEach((emp, index) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${emp.name}</td>
+                    <td>${emp.code}</td>
+                    <td>${emp.post}</td>
+                    <td>${emp.start_shift}</td>
+                    <td>${weekDays[emp.rest_day]}</td>
+                    <td>
+                        <button class="btn btn-danger btn-sm" onclick="removeEmployee(${index})">Remove</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        async function generateSchedule() {
+            if (employees.length === 0) {
+                alert('Please add at least one employee');
+                return;
+            }
+
+            const month = document.getElementById('month').value;
+            const year = document.getElementById('year').value;
+
+            try {
+                const response = await fetch('/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        month: month,
+                        year: year,
+                        employees: employees
+                    })
+                });
+
+                const data = await response.json();
+                displaySchedule(data);
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error generating schedule');
+            }
+        }
+
+        function displaySchedule(data) {
+            const table = document.getElementById('scheduleTable');
+            table.innerHTML = '';
+
+            // Create header rows
+            const headerRow1 = table.insertRow();
+            const headerRow2 = table.insertRow();
+            const headerRow3 = table.insertRow();
+
+            // Add headers
+            headerRow1.innerHTML = `
+                <th colspan="3">BAGASSE YARD</th>
+                <th colspan="6">SHIFT SCHEDULE</th>
+                <th colspan="4">${data.month_name.toUpperCase()} ${data.year}</th>
+            `;
+
+            // Add employee and date headers
+            headerRow2.innerHTML = `
+                <th>S.R</th>
+                <th>SUPERVISOR</th>
+                <th>CODE NO.</th>
+            `;
+
+            headerRow3.innerHTML = `
+                <th></th>
+                <th></th>
+                <th></th>
+            `;
+
+            // Add date headers
+            const daysInMonth = new Date(data.year, data.month, 0).getDate();
+            for (let day = 1; day <= daysInMonth; day++) {
+                const date = new Date(data.year, data.month - 1, day);
+                const dayName = date.toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase();
+                
+                headerRow2.innerHTML += `<th>${day}</th>`;
+                headerRow3.innerHTML += `<th>${dayName}</th>`;
+            }
+
+            // Add employee rows
+            let srNo = 1;
+
+            // First add supervisors
+            Object.entries(data.schedule).forEach(([name, empData]) => {
+                if (empData.post.toUpperCase() === 'SUPERVISOR') {
+                    const row = table.insertRow();
+                    row.innerHTML = `<td>${srNo}</td><td>${name}</td><td>${empData.code}</td>`;
+                    empData.shifts.forEach(shift => {
+                        const td = document.createElement('td');
+                        td.textContent = shift;
+                        row.appendChild(td);
+                    });
+                    srNo++;
+                }
+            });
+
+            // Then add helpers
+            Object.entries(data.schedule).forEach(([name, empData]) => {
+                if (empData.post.toUpperCase() === 'HELPER') {
+                    const row = table.insertRow();
+                    row.innerHTML = `<td>${srNo}</td><td>${name}</td><td>${empData.code}</td>`;
+                    empData.shifts.forEach(shift => {
+                        const td = document.createElement('td');
+                        td.textContent = shift;
+                        row.appendChild(td);
+                    });
+                    srNo++;
+                }
+            });
+        }
+
+        async function exportToExcel() {
+            if (employees.length === 0) {
+                alert('Please add at least one employee');
+                return;
+            }
+
+            const month = document.getElementById('month').value;
+            const year = document.getElementById('year').value;
+
+            try {
+                const generateResponse = await fetch('/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        month: month,
+                        year: year,
+                        employees: employees
+                    })
+                });
+
+                const scheduleData = await generateResponse.json();
+
+                const exportResponse = await fetch('/export', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        schedule: scheduleData.schedule,
+                        month: parseInt(month),
+                        year: parseInt(year)
+                    })
+                });
+
+                const blob = await exportResponse.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `duty_schedule_${month}_${year}.xlsx`;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error exporting schedule');
+            }
+        }
+    </script>
+</body>
+</html>
