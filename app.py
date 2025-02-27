@@ -1,3 +1,4 @@
+import os
 from flask import Flask, render_template, request, send_file, jsonify
 from datetime import datetime, timedelta
 import calendar
@@ -5,9 +6,13 @@ import io
 from openpyxl import Workbook
 from openpyxl.styles import PatternFill, Font, Alignment, Border, Side
 from openpyxl.utils import get_column_letter
-import os
 
 app = Flask(__name__)
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'default-key-for-dev')
+
+# Create uploads directory if it doesn't exist
+if not os.path.exists('uploads'):
+    os.makedirs('uploads')
 
 class DutyScheduler:
     def __init__(self):
