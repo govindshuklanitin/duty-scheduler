@@ -26,12 +26,19 @@ class DutyScheduler:
         self.shift_rotation = {'A': 'C', 'C': 'B', 'B': 'A'}
         
     def get_day_name(self, year, month, day):
-        return calendar.day_abbr[calendar.weekday(year, month, day)].upper()
+        """Get the name of the day for a given date"""
+        return calendar.day_name[calendar.weekday(year, month, day)]
+
+    def should_be_rest_day(self, year, month, day, rest_day):
+        """Check if a given date should be a rest day"""
+        day_name = self.get_day_name(year, month, day)
+        return day_name.upper() == rest_day.upper()
 
     def get_next_shift(self, current_shift):
         return self.shift_rotation.get(current_shift, current_shift)
 
     def generate_schedule(self, employees_data, year, month):
+        """Generate monthly duty schedule for employees"""
         num_days = calendar.monthrange(year, month)[1]
         schedule = {}
         
@@ -39,24 +46,19 @@ class DutyScheduler:
             schedule[emp['name']] = {
                 'code': emp['code'],
                 'post': emp['post'],
-                'shifts': []
+                'shifts': [''] * num_days
             }
             
-            current_shift = emp['start_shift']
-            rest_day = emp['rest_day']
-            was_rest_day = False  # Flag to track if previous day was rest day
-            
+            # First assign rest days
             for day in range(1, num_days + 1):
-                # Check if it's a rest day
-                if (day - 1) % 7 == rest_day:
-                    schedule[emp['name']]['shifts'].append('R')
-                    was_rest_day = True
-                else:
-                    # If previous day was rest day, change the shift according to rotation
-                    if was_rest_day and current_shift != 'G':
-                        current_shift = self.get_next_shift(current_shift)
-                        was_rest_day = False
-                    schedule[emp['name']]['shifts'].append(current_shift)
+                if self.should_be_rest_day(year, month, day, emp['rest_day']):
+                    schedule[emp['name']]['shifts'][day - 1] = 'R'
+            
+            current_shift = emp['start_shift']
+            for day in range(1, num_days + 1):
+                if schedule[emp['name']]['shifts'][day - 1] != 'R':
+                    schedule[emp['name']]['shifts'][day - 1] = current_shift
+                    current_shift = self.get_next_shift(current_shift)
                     
         return schedule
 
